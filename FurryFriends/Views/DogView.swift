@@ -10,11 +10,17 @@ import SwiftUI
 struct ContentView: View {
     
     // MARK: Stored properties
+    @State var currentImage: DogImage = DogImage(id: "",
+                                                 message: "https://images.dog.ceo/breeds/mastiff-bull/n02108422_3297.jpg",
+                                                 status: "success")
+    //Keeps track of favourites
+    @State var favourites: [DogImage] = []
+    
     
     // Address for main image
     // Starts as a transparent pixel – until an address for an animal's image is set
-    @State var currentImage = URL(string: "https://www.russellgordon.ca/lcs/miscellaneous/transparent-pixel.png")!
-    
+//    @State var currentImage = URL(string: "https://www.russellgordon.ca/lcs/miscellaneous/transparent-pixel.png")!
+//
     // MARK: Computed properties
     var body: some View {
         
