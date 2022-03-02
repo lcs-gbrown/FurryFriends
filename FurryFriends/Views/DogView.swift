@@ -10,13 +10,17 @@ import SwiftUI
 struct ContentView: View {
     
     // MARK: Stored properties
+    // Checks for app activity
+    // https://developer.apple.com/documentation/swiftui/environmentvalues
+    @Environment(\.scenePhase) var scenePhase
     
-    @State var currentDog: DogImage = DogImage(message: "https://images.dog.ceo/breeds/mastiff-bull/n02108422_3297.jpg", status: "success")
+    @State var currentDog: DogImage = DogImage(message: "https://images.dog.ceo/breeds/mastiff-bull/n02108422_3297.jpg",
+                                               status: "success")
     
-    // Keeps track of our list of favourite jokes
-    @State var favourites: [DogImage] = []   // empty list to start
+    // Keeps track of of favourite images
+    @State var favourites: [DogImage] = []
     
-    // This will let us know whether the current exists as a favourite
+    // lets us know whether the current exists as a favourite
     @State var currentImageAddedToFavourites: Bool = false
     
     // MARK: Computed properties
@@ -60,6 +64,14 @@ struct ContentView: View {
             })
                 .buttonStyle(.bordered)
             
+            HStack {
+                Text("Favourites")
+                    .bold()
+                    .padding()
+                    .font(.title)
+                
+                Spacer()
+            }
             
             // Iterate over the list of favourites
             // As we iterate, each individual favourite is
@@ -67,7 +79,45 @@ struct ContentView: View {
             List(favourites, id: \.self) { currentFavourite in
                 Text(currentFavourite.message)
             }
-            .navigationTitle("Furry Friends")
+            
+            Spacer()
+            
+        
+            // React to changes of state for the app (foreground, background, and inactive)
+             .onChange(of: scenePhase) { newPhase in
+
+                 if newPhase == .inactive {
+
+                     print("Inactive")
+
+                 } else if newPhase == .active {
+
+                     print("Active")
+
+                 } else if newPhase == .background {
+
+                     print("Background")
+
+                     // Permanently save the list of tasks
+                     persistFavourites()
+
+                 }
+
+             }
+
+            // When the app opens, get a new joke from the web service
+            .task {
+                
+           //load new image
+                await loadNewImage()
+                
+                print("loading image")
+                
+                //Loading favourites from the local device storage
+                loadFavourites()
+            }
+            .navigationTitle("Cutedogpicsforyou")
+            .padding()
             
         }
         
@@ -102,6 +152,9 @@ struct ContentView: View {
             //                                         |
             //                                         V
             currentDog = try JSONDecoder().decode(DogImage.self, from: data)
+            
+            // Reset the flag that tracks whether the image is a favourite
+            currentImageAddedToFavourites = false
             
         } catch {
             print("Could not retrieve or decode the JSON from endpoint.")
@@ -146,7 +199,41 @@ struct ContentView: View {
         
     }
     
+    // Loads favourites from local storage on the device into the list of favourites
+    func loadFavourites() {
+        
+        // Get a URL that points to the saved JSON data containing our list of favourites
+        let filename = getDocumentsDirectory().appendingPathComponent(savedFavouritesLabel)
+        print(filename)
+                
+        // Attempt to load from the JSON in the stored / persisted file
+        do {
+            
+            // Load the raw data
+            let data = try Data(contentsOf: filename)
+            
+            // What was loaded from the file?
+            print("Got data from file, contents are:")
+            print(String(data: data, encoding: .utf8)!)
+
+            // Decode the data into Swift native data structures
+            // Note that we use [DadJoke] since we are loading into a list (array)
+            // of instances of the DadJoke structure
+            favourites = try JSONDecoder().decode([DogImage].self, from: data)
+            
+        } catch {
+            
+            // What went wrong?
+            print(error.localizedDescription)
+            print("Could not load data from file, initializing with tasks provided to initializer.")
+
+        }
+
+        
+    }
 }
+    
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
