@@ -77,7 +77,7 @@ struct ContentView: View {
             // As we iterate, each individual favourite is
             // accessible via "currentFavourite"
             List(favourites, id: \.self) { currentFavourite in
-                Text(currentFavourite.message)
+                RemoteImageView(fromURL: URL(string: currentFavourite.message)!)
             }
             
             Spacer()
