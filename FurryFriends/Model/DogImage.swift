@@ -8,8 +8,7 @@
 import Foundation
 
 struct DogImage: Decodable, Hashable, Encodable {
-    // defined the id here because the id is not given by the JSON endpoint itself
-    var id = UUID()
+    // used hashable here because the id is not given by the JSON endpoint itself
     let message: String
     let status: String
 }

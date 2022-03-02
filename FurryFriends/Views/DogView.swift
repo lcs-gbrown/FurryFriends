@@ -29,23 +29,23 @@ struct ContentView: View {
             
             Image(systemName: "heart.circle")
                 .font(.largeTitle)
-                //                      CONDITION                        true   false
+            //                      CONDITION                        true   false
                 .foregroundColor(currentImageAddedToFavourites == true ? .red : .secondary)
                 .onTapGesture {
-
+                    
                     // Only add to the list if it is not already there
                     if currentImageAddedToFavourites == false {
-
+                        
                         // Adds the current joke to the list
                         favourites.append(currentDog)
-
+                        
                         // Record that we have marked this as a favourite
                         currentImageAddedToFavourites = true
-
+                        
                     }
-
+                    
                 }
-
+            
             Button(action: {
                 
                 // The Task type allows us to run asynchronous code
@@ -53,22 +53,29 @@ struct ContentView: View {
                 // when the data is ready.
                 Task {
                     // Call the function that will get us a new joke!
-                    await loadNewDog()
+                    await loadNewImage()
                 }
             }, label: {
                 Text("Another dog!")
             })
                 .buttonStyle(.bordered)
-
+            
+            
+            // Iterate over the list of favourites
+            // As we iterate, each individual favourite is
+            // accessible via "currentFavourite"
+            List(favourites, id: \.self) { currentFavourite in
+                Text(currentFavourite.message)
+            }
+            .navigationTitle("Furry Friends")
+            
         }
-        .navigationTitle("Furry Friends")
         
     }
-    
     // MARK: Functions
     // Using the "async" keyword means that this function can potentially
     // be run alongside other tasks that the app needs to do
-    func loadNewDog() async {
+    func loadNewImage() async {
         // Assemble the URL that points to the endpoint
         let url = URL(string: "https://dog.ceo/api/breeds/image/random")!
         
@@ -102,9 +109,9 @@ struct ContentView: View {
             // populates
             print(error)
         }
-
+        
     }
-
+    
     // Saves (persists) the data to local storage on the device
     func persistFavourites() {
         
@@ -136,7 +143,7 @@ struct ContentView: View {
             print("Unable to write list of favourites to documents directory in app bundle on device.")
             
         }
-
+        
     }
     
 }

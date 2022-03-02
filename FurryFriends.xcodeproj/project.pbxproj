@@ -43,9 +43,9 @@
 		0A98A6D827CE61FB001F3020 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				0A98A6D627CE61E2001F3020 /* DogImage.swift */,
 				0A98A6D927CEFB08001F3020 /* Shared */,
 				8134B15727CA5B63004DEB85 /* Helpers */,
-				0A98A6D627CE61E2001F3020 /* DogImage.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
