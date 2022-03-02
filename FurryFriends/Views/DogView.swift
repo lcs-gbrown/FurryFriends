@@ -10,77 +10,42 @@ import SwiftUI
 struct ContentView: View {
     
     // MARK: Stored properties
-   
-    @State var currentImage: DogImage = DogImage(id: "",
-                                                 message: "https://images.dog.ceo/breeds/mastiff-bull/n02108422_3297.jpg",
-                                                 status: "success")
-    //Pass in property of structure to image address
-    @State var currentURL = URL(string: "https://images.dog.ceo/breeds/mastiff-bull/n02108422_3297.jpg")
     
-    //Keeps track of favourites
-    @State var favourites: [DogImage] = []
+    @State var currentDog: DogImage = DogImage(message: "https://images.dog.ceo/breeds/african/n02116738_2344.jpg", status: "success")
     
-    // Check if current image is already favourite
-    @State var currentImageAddedToFavourites: Bool = false
-    
-    // Address for main image
-    // Starts as a transparent pixel – until an address for an animal's image is set
-//    @State var currentImage = URL(string: "https://www.russellgordon.ca/lcs/miscellaneous/transparent-pixel.png")!
-//
     // MARK: Computed properties
     var body: some View {
         
         VStack {
             
             // Shows the main image
-            RemoteImageView(fromURL: currentURL!)
+            RemoteImageView(fromURL: URL(string: currentDog.message)!)
             
-            // Push main image to top of screen
-            Spacer()
-            
-            Image(systemName: "heart.circle")
-                .font(.largeTitle)
-                //                      CONDITION                        true   false
-                .foregroundColor(currentImageAddedToFavourites == true ? .red : .secondary)
-                .onTapGesture {
-                    
-                    // Only add to the list if it is not already there
-                    if currentImageAddedToFavourites == false {
-                        
-                        // Adds the current joke to the list
-                        favourites.append(currentImage)
-                        
-                        // Record that we have marked this as a favourite
-                        currentImageAddedToFavourites = true
-
-                    }
-                    
+            Button(action: {
+                
+                // The Task type allows us to run asynchronous code
+                // within a button and have the user interface be updated
+                // when the data is ready.
+                Task {
+                    // Call the function that will get us a new joke!
+                    await loadNewDog()
                 }
-
+            }, label: {
+                Text("Another dog!")
+            })
+                .buttonStyle(.bordered)
 
         }
-        // Runs once when the app is opened
-//        .task {
-//
-//            // Example images for each type of pet
-//            let remoteCatImage = "https://purr.objects-us-east-1.dream.io/i/JJiYI.jpg"
-//            let remoteDogImage = "https://images.dog.ceo/breeds/labrador/lab_young.JPG"
-//
-//            // Replaces the transparent pixel image with an actual image of an animal
-//            // Adjust according to your preference ☺️
-//            currentImage = URL(string: currentURL)
-//
-//        }
         .navigationTitle("Furry Friends")
         
     }
     
     // MARK: Functions
-    
-    //loads new images
-    func loadNewImage () async {
+    // Using the "async" keyword means that this function can potentially
+    // be run alongside other tasks that the app needs to do
+    func loadNewDog() async {
         // Assemble the URL that points to the endpoint
-        let url = URL(string: "https://images.dog.ceo/breeds/mastiff-bull/n02108422_3297.jpg")!
+        let url = URL(string: "https://dog.ceo/api/breeds/image/random")!
         
         // Define the type of data we want from the endpoint
         // Configure the request to the web site
@@ -92,30 +57,30 @@ struct ContentView: View {
         // Start a session to interact (talk with) the endpoint
         let urlSession = URLSession.shared
         
-        // Generate new image, in case of failure use do catch
+        // Try to fetch a new dog
+        // It might not work, so we use a do-catch block
         do {
             
             // Get the raw data from the endpoint
             let (data, _) = try await urlSession.data(for: request)
             
             // Attempt to decode the raw data into a Swift structure
-            // Takes what is in "data" and tries to put it into "currentJoke"
+            // Takes what is in "data" and tries to put it into "currentDog"
             //                                 DATA TYPE TO DECODE TO
             //                                         |
             //                                         V
-            currentImage = try JSONDecoder().decode(DogImage.self, from: data)
-            
-            // Reset the flag that tracks whether the current joke
-            // is a favourite
-            currentImageAddedToFavourites = false
+            currentDog = try JSONDecoder().decode(DogImage.self, from: data)
             
         } catch {
             print("Could not retrieve or decode the JSON from endpoint.")
-            // Print the contents of the "error" constant that the do-catch block sees
+            // Print the contents of the "error" constant that the do-catch block
+            // populates
             print(error)
         }
 
     }
+
+
     
 }
 
