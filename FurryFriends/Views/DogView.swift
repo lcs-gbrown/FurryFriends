@@ -11,7 +11,13 @@ struct ContentView: View {
     
     // MARK: Stored properties
     
-    @State var currentDog: DogImage = DogImage(message: "https://images.dog.ceo/breeds/african/n02116738_2344.jpg", status: "success")
+    @State var currentDog: DogImage = DogImage(message: "https://images.dog.ceo/breeds/mastiff-bull/n02108422_3297.jpg", status: "success")
+    
+    // Keeps track of our list of favourite jokes
+    @State var favourites: [DogImage] = []   // empty list to start
+    
+    // This will let us know whether the current exists as a favourite
+    @State var currentImageAddedToFavourites: Bool = false
     
     // MARK: Computed properties
     var body: some View {
@@ -21,6 +27,25 @@ struct ContentView: View {
             // Shows the main image
             RemoteImageView(fromURL: URL(string: currentDog.message)!)
             
+            Image(systemName: "heart.circle")
+                .font(.largeTitle)
+                //                      CONDITION                        true   false
+                .foregroundColor(currentImageAddedToFavourites == true ? .red : .secondary)
+                .onTapGesture {
+
+                    // Only add to the list if it is not already there
+                    if currentImageAddedToFavourites == false {
+
+                        // Adds the current joke to the list
+                        favourites.append(currentDog)
+
+                        // Record that we have marked this as a favourite
+                        currentImageAddedToFavourites = true
+
+                    }
+
+                }
+
             Button(action: {
                 
                 // The Task type allows us to run asynchronous code
@@ -80,7 +105,39 @@ struct ContentView: View {
 
     }
 
+    // Saves (persists) the data to local storage on the device
+    func persistFavourites() {
+        
+        // Get a URL that points to the saved JSON data containing our list of tasks
+        let filename = getDocumentsDirectory().appendingPathComponent(savedFavouritesLabel)
+        
+        // Try to encode the data in our people array to JSON
+        do {
+            // Create an encoder
+            let encoder = JSONEncoder()
+            
+            // Ensure the JSON written to the file is human-readable
+            encoder.outputFormatting = .prettyPrinted
+            
+            // Encode the list of favourites we've collected
+            let data = try encoder.encode(favourites)
+            
+            // Actually write the JSON file to the documents directory
+            try data.write(to: filename, options: [.atomicWrite, .completeFileProtection])
+            
+            // See the data that was written
+            print("Saved data to documents directory successfully.")
+            print("===")
+            print(String(data: data, encoding: .utf8)!)
+            
+        } catch {
+            
+            print(error.localizedDescription)
+            print("Unable to write list of favourites to documents directory in app bundle on device.")
+            
+        }
 
+    }
     
 }
 
