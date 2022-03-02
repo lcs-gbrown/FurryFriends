@@ -80,7 +80,6 @@ struct ContentView: View {
                 RemoteImageView(fromURL: URL(string: currentFavourite.message)!)
             }
             
-            Spacer()
             
         
             // React to changes of state for the app (foreground, background, and inactive)
