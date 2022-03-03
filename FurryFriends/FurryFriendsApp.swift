@@ -14,12 +14,12 @@ struct FurryFriendsApp: App {
             NavigationView {
                 
                 TabView {
-                    CatView()
+                    PetView(petIsDog: false)
                         .tabItem {
                             Image(systemName: "pawprint.circle")
                         }
                     
-                    DogView()
+                    PetView(petIsDog: true) 
                         .tabItem {
                             Image(systemName: "pawprint.circle.fill")
                         }

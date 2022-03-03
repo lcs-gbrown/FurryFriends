@@ -12,3 +12,7 @@ struct DogImage: Decodable, Hashable, Encodable {
     let message: String
     let status: String
 }
+
+
+
+

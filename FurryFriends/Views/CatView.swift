@@ -14,6 +14,8 @@ struct CatView: View {
     // https://developer.apple.com/documentation/swiftui/environmentvalues
     @Environment(\.scenePhase) var scenePhase
     
+
+    
     @State var currentCat: CatImage = CatImage(file:"https://purr.objects-us-east-1.dream.io/i/Lpmgh.jpg")
     
     // Keeps track of of favourite images
@@ -24,7 +26,7 @@ struct CatView: View {
     
     // MARK: Computed properties
     var body: some View {
-        
+       
         VStack {
             
             // Shows the main image
